@@ -24,18 +24,15 @@
 # Default values for the prompt
 # Override these values in ~/.zshrc or ~/.bashrc
 AZ_PS1_BINARY="${AZ_PS1_BINARY:-az}"
-AZ_PS1_SYMBOL_ENABLE="${AZ_PS1_SYMBOL_ENABLE:-true}"
-AZ_PS1_SYMBOL_DEFAULT="${AZ_PS1_SYMBOL_DEFAULT:-\u2388 }"
-AZ_PS1_SYMBOL_USE_IMG="${AZ_PS1_SYMBOL_USE_IMG:-false}"
-AZ_PS1_NS_ENABLE="${AZ_PS1_NS_ENABLE:-true}"
+AZ_PS1_JQ_BINARY="${AZ_PS1_JQ_BINARY:-jq}"
 AZ_PS1_PREFIX="${AZ_PS1_PREFIX-(}"
 AZ_PS1_SUFFIX="${AZ_PS1_SUFFIX-)}"
-AZ_PS1_SYMBOL_COLOR="${AZ_PS1_SYMBOL_COLOR-blue}"
-AZ_PS1_CTX_COLOR="${AZ_PS1_CTX_COLOR-red}"
+AZ_PS1_SUBSCRIPTION_COLOR="${AZ_PS1_SUBSCRIPTION_COLOR-red}"
 AZ_PS1_BG_COLOR="${AZ_PS1_BG_COLOR}"
 AZ_PS1_CLOUD_CONFIG_FILE="${HOME}/.azure/clouds.config"
+AZ_PS1_CONFIG_FILE="${HOME}/.azure/config"
+AZ_PS1_AZURE_PROFILE_FILE="${HOME}/.azure/azureProfile.json"
 AZ_PS1_DISABLE_PATH="${HOME}/.azure/az-ps1/disabled"
-AZ_PS1_LAST_TIME=0
 
 # Determine our shell
 if [ "${ZSH_VERSION-}" ]; then
@@ -47,12 +44,14 @@ fi
 _az_ps1_init() {
   [[ -f "${AZ_PS1_DISABLE_PATH}" ]] && AZ_PS1_ENABLED=off
 
-  #AZ_MD5SUM_CURRENT="$(md5 -r $HOME/.azure/clouds.config)"
-  #AZ_MD5SUM_CACHE=$AZ_MD5SUM_CURRENT
-  echo $AZ_MD5SUM_CURRENT
-  echo $AZ_MD5SUM_CACHE
-  echo $AZ_PS1_SUBSCRIPTION
-  #AZ_PS1_SUBSCRIPTION
+  # Set the correct md5 command
+  if [[ `uname` == 'FreeBSD' ]] || [[ `uname` == 'Darwin' ]]; then
+    AZ_PS1_MD5_BINARY="md5"
+  elif [[ `uname` == 'Linux' ]]; then
+    AZ_PS1_MD5_BINARY="md5sum"
+  fi
+
+  AZ_MD5SUM_CACHE=$AZ_MD5SUM_CURRENT
 
   case "${AZ_PS1_SHELL}" in
     "zsh")
@@ -161,7 +160,7 @@ _az_ps1_update_cache() {
     return
   fi
 
-  AZ_MD5SUM_CURRENT="$(md5 -r $HOME/.azure/clouds.config)"
+  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $AZ_PS1_CLOUD_CONFIG_FILE)$($AZ_PS1_MD5_BINARY $AZ_PS1_CONFIG_FILE)"
 
   if [[ "${AZ_MD5SUM_CURRENT}" != "${AZ_MD5SUM_CACHE}" ]]; then
     # The Azure configuration file changed, fetch
@@ -172,24 +171,38 @@ _az_ps1_update_cache() {
 
 }
 
-_az_ps1_get_subscription() {
-  # Set the command time
-  if [[ "${AZ_PS1_SHELL}" == "bash" ]]; then
-    if ((BASH_VERSINFO[0] >= 4)); then
-      AZ_PS1_LAST_TIME=$(printf '%(%s)T')
-    else
-      AZ_PS1_LAST_TIME=$(date +%s)
-    fi
-  elif [[ "${AZ_PS1_SHELL}" == "zsh" ]]; then
-    AZ_PS1_LAST_TIME=$EPOCHSECONDS
-  fi
+_az_ps1_get_subscription_with_jq() {
 
-  #AZ_PS1_SUBSCRIPTION="$(${AZ_PS1_BINARY} account show --output tsv | cut -f 4 2>/dev/null)"
-  AZ_PS1_SUBSCRIPTION="$(cat ${AZ_PS1_CLOUD_CONFIG_FILE} | grep subscription | cut -d ' ' -f 3)"
-  echo $AZ_PS1_SUBSCRIPTION
+  # Get the current Cloud
+  AZ_CLOUD="$(az cloud list --out tsv --query '[?isActive].name')"
+
+  # Get the current subcription id
+  AZ_PS1_SUBSCRIPTION_ID="$(cat ${AZ_PS1_CLOUD_CONFIG_FILE} | grep -A1 ${AZ_CLOUD} | grep -v ${AZ_CLOUD} | cut -d ' ' -f 3)"
+
+  # Get the subscription name from its id
+  AZ_PS1_SUBSCRIPTION=$(cat $AZ_PS1_AZURE_PROFILE_FILE | jq -r ".subscriptions[] | select(.id==\"$AZ_PS1_SUBSCRIPTION_ID\") | .name")
   if [[ -z "${AZ_PS1_SUBSCRIPTION}" ]]; then
     AZ_PS1_SUBSCRIPTION="N/A"
     return
+  fi
+}
+
+_az_ps1_get_subscription_with_az() {
+
+  AZ_PS1_SUBSCRIPTION="$(${AZ_PS1_BINARY} account show --out tsv --query 'name' 2>/dev/null)"
+
+  if [[ -z "${AZ_PS1_SUBSCRIPTION}" ]]; then
+    AZ_PS1_SUBSCRIPTION="N/A"
+    return
+  fi
+}
+
+_az_ps1_get_subscription() {
+
+  if _az_ps1_binary_check "${AZ_PS1_JQ_BINARY}"; then
+    _az_ps1_get_subscription_with_jq
+  else
+    _az_ps1_get_subscription_with_az
   fi
 }
 
@@ -264,11 +277,8 @@ az_ps1() {
   # Prefix
   [[ -n "${AZ_PS1_PREFIX}" ]] && AZ_PS1+="${AZ_PS1_PREFIX}"
 
-  # Symbol
-  #AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_SYMBOL_COLOR)${AZ_PS1_RESET_COLOR}"
-
   # Context
-  AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_CTX_COLOR)${AZ_PS1_SUBSCRIPTION}${AZ_PS1_RESET_COLOR}"
+  AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_SUBSCRIPTION_COLOR)${AZ_PS1_SUBSCRIPTION}${AZ_PS1_RESET_COLOR}"
 
   # Suffix
   [[ -n "${AZ_PS1_SUFFIX}" ]] && AZ_PS1+="${AZ_PS1_SUFFIX}"
