@@ -44,7 +44,7 @@ _az_ps1_init() {
   [[ -f "${AZ_PS1_DISABLE_PATH}" ]] && AZ_PS1_ENABLED=off
 
   # Set the correct md5 command
-  if [[ `uname` == 'FreeBSD' ]]; then
+  if [[ `uname` == 'FreeBSD' ]] || [[ `uname` == 'Darwin' ]]; then
     AZ_PS1_MD5_BINARY="md5"
   elif [[ `uname` == 'Linux' ]]; then
     AZ_PS1_MD5_BINARY="md5sum"
