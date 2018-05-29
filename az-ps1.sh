@@ -25,20 +25,13 @@
 # Override these values in ~/.zshrc or ~/.bashrc
 AZ_PS1_BINARY="${AZ_PS1_BINARY:-az}"
 AZ_PS1_JQ_BINARY="${AZ_PS1_JQ_BINARY:-jq}"
-AZ_PS1_MD5_BINARY="${AZ_PS1_MD5_BINARY:-md5}"
-AZ_PS1_SYMBOL_ENABLE="${AZ_PS1_SYMBOL_ENABLE:-true}"
-AZ_PS1_SYMBOL_DEFAULT="${AZ_PS1_SYMBOL_DEFAULT:-\u2388 }"
-AZ_PS1_SYMBOL_USE_IMG="${AZ_PS1_SYMBOL_USE_IMG:-false}"
-AZ_PS1_NS_ENABLE="${AZ_PS1_NS_ENABLE:-true}"
 AZ_PS1_PREFIX="${AZ_PS1_PREFIX-(}"
 AZ_PS1_SUFFIX="${AZ_PS1_SUFFIX-)}"
-AZ_PS1_SYMBOL_COLOR="${AZ_PS1_SYMBOL_COLOR-blue}"
-AZ_PS1_CTX_COLOR="${AZ_PS1_CTX_COLOR-red}"
+AZ_PS1_SUBSCRIPTION_COLOR="${AZ_PS1_SUBSCRIPTION_COLOR-red}"
 AZ_PS1_BG_COLOR="${AZ_PS1_BG_COLOR}"
 AZ_PS1_CLOUD_CONFIG_FILE="${HOME}/.azure/clouds.config"
 AZ_PS1_AZURE_PROFILE_FILE="${HOME}/.azure/azureProfile.json"
 AZ_PS1_DISABLE_PATH="${HOME}/.azure/az-ps1/disabled"
-AZ_PS1_LAST_TIME=0
 
 # Determine our shell
 if [ "${ZSH_VERSION-}" ]; then
@@ -166,7 +159,7 @@ _az_ps1_update_cache() {
     return
   fi
 
-  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $HOME/.azure/clouds.config)"
+  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $AZ_PS1_CLOUD_CONFIG_FILE)"
 
   if [[ "${AZ_MD5SUM_CURRENT}" != "${AZ_MD5SUM_CACHE}" ]]; then
     # The Azure configuration file changed, fetch
@@ -280,11 +273,8 @@ az_ps1() {
   # Prefix
   [[ -n "${AZ_PS1_PREFIX}" ]] && AZ_PS1+="${AZ_PS1_PREFIX}"
 
-  # Symbol
-  #AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_SYMBOL_COLOR)${AZ_PS1_RESET_COLOR}"
-
   # Context
-  AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_CTX_COLOR)${AZ_PS1_SUBSCRIPTION}${AZ_PS1_RESET_COLOR}"
+  AZ_PS1+="$(_az_ps1_color_fg $AZ_PS1_SUBSCRIPTION_COLOR)${AZ_PS1_SUBSCRIPTION}${AZ_PS1_RESET_COLOR}"
 
   # Suffix
   [[ -n "${AZ_PS1_SUFFIX}" ]] && AZ_PS1+="${AZ_PS1_SUFFIX}"
