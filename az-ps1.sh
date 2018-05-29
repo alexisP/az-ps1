@@ -25,6 +25,7 @@
 # Override these values in ~/.zshrc or ~/.bashrc
 AZ_PS1_BINARY="${AZ_PS1_BINARY:-az}"
 AZ_PS1_JQ_BINARY="${AZ_PS1_JQ_BINARY:-jq}"
+AZ_PS1_MD5_BINARY="${AZ_PS1_MD5_BINARY:-md5}"
 AZ_PS1_SYMBOL_ENABLE="${AZ_PS1_SYMBOL_ENABLE:-true}"
 AZ_PS1_SYMBOL_DEFAULT="${AZ_PS1_SYMBOL_DEFAULT:-\u2388 }"
 AZ_PS1_SYMBOL_USE_IMG="${AZ_PS1_SYMBOL_USE_IMG:-false}"
@@ -48,6 +49,13 @@ fi
 
 _az_ps1_init() {
   [[ -f "${AZ_PS1_DISABLE_PATH}" ]] && AZ_PS1_ENABLED=off
+
+  # Set the correct md5 command
+  if [[ `uname` == 'FreeBSD' ]]; then
+    AZ_PS1_MD5_BINARY="md5"
+  elif [[ `uname` == 'Linux' ]]; then
+    AZ_PS1_MD5_BINARY="md5sum"
+  fi
 
   AZ_MD5SUM_CACHE=$AZ_MD5SUM_CURRENT
 
@@ -158,7 +166,7 @@ _az_ps1_update_cache() {
     return
   fi
 
-  AZ_MD5SUM_CURRENT="$(md5 -r $HOME/.azure/clouds.config)"
+  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $HOME/.azure/clouds.config)"
 
   if [[ "${AZ_MD5SUM_CURRENT}" != "${AZ_MD5SUM_CACHE}" ]]; then
     # The Azure configuration file changed, fetch
