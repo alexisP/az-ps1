@@ -98,9 +98,9 @@ argument.
 
 ## Tips & Tricks
 
-If, like me, you are using Oh My Zsh with the agnoster theme and the Solarized Dark colorscheme, you probably want to set the backgroud color like so to make it clean
+If, like me, you are using Oh My Zsh with the agnoster theme and the Solarized Dark colorscheme, you probably want to set the backgroud color like so (in your `$HOME/.zshrc`) to make it clean
 ```
-TODO
+AZ_PS1_BG_COLOR=#586e75
 ```
 
 ## Credits
