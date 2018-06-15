@@ -1,9 +1,11 @@
 az-ps1 displays your subscription in your prompt
 ================================================
 
-When dealing with multiple Azure subcriptions, it quickly become difficult to know on which subscription we are currently plugged in and you can easily make mistakes. This simple script helps you by displaying the current Azure subscription right in your prompt. 
+When dealing with multiple Azure subcriptions, it quickly become difficult to know on which subscription we are currently plugged in and you can easily make mistakes. This simple script helps you by displaying the current Azure subscription right in your prompt.
 
 It is supported on both bash and zsh prompts.
+
+![Demo](images/az-ps1-prompt.gif)
 
 ## Installing
 
