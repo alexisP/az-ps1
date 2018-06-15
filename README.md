@@ -102,3 +102,7 @@ If, like me, you are using Oh My Zsh with the agnoster theme and the Solarized D
 ```
 TODO
 ```
+
+## Credits
+
+This script has been inspired by Jon Mosco's prompt helper for Kubernetes (https://github.com/jonmosco/kube-ps1). As a regular user of both Azure and Kubernetes, I thought that Azure deserves the same kind of helper to ease multiple subscriptions.
