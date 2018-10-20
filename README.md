@@ -1,7 +1,7 @@
 az-ps1 displays your subscription in your prompt
 ================================================
 
-When dealing with multiple Azure subcriptions, it quickly become difficult to know on which subscription we are currently plugged in and you can easily make mistakes. This simple script helps you by displaying the current Azure subscription right in your prompt.
+When dealing with multiple Azure subcriptions, it quickly become difficult to know which subscription is the active one and you can easily make mistakes. This simple script helps you by displaying the current Azure subscription right in your prompt.
 
 It is supported on both bash and zsh prompts.
 
@@ -34,13 +34,13 @@ There are two ways to get the current subcription name:
 1. from the Azure CLI itself
 2. from local files that stores the information
 
-The second option is much more faster and will be the privileged option but it has an additional prerequisite to work: JQ which is used to parse and query the local JSON files (https://stedolan.github.io/jq/). Simply install JQ and the script will use it and will be faster.
+The second option is much more faster and will be the privileged option but it requires an additional prerequisite to work: JQ which is used to parse and query the local JSON files (https://stedolan.github.io/jq/). Simply install JQ and the script will use it by default and will be faster.
 
 ## Enabling/Disabling
 
 If you want to stop showing the current subscription on your prompt string temporarily
 run `azoff`. To disable the prompt for all shell sessions, run `azoff -g`.
-You can enable it again in the current shell by running `kubeon`, and globally
+You can enable it again in the current shell by running `azon`, and globally
 with `azon -g`.
 
 ```
@@ -105,4 +105,4 @@ AZ_PS1_BG_COLOR=#586e75
 
 ## Credits
 
-This script has been inspired by Jon Mosco's prompt helper for Kubernetes (https://github.com/jonmosco/kube-ps1). As a regular user of both Azure and Kubernetes, I thought that Azure deserves the same kind of helper to ease multiple subscriptions.
+This script has been inspired by Jon Mosco's prompt helper for Kubernetes (https://github.com/jonmosco/kube-ps1). As a regular user of both Azure and Kubernetes, I thought that Azure deserves the same kind of helper to ease multiple subscriptions management.

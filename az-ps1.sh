@@ -175,7 +175,7 @@ _az_ps1_get_subscription_with_jq() {
   # Get the current subcription id
   AZ_PS1_SUBSCRIPTION_ID="$(cat ${AZ_PS1_CLOUD_CONFIG_FILE} | grep subscription | cut -d ' ' -f 3)"
 
-  # Get the subscription nam from its id
+  # Get the subscription name from its id
   AZ_PS1_SUBSCRIPTION=$(cat $AZ_PS1_AZURE_PROFILE_FILE | jq -r ".subscriptions[] | select(.id==\"$AZ_PS1_SUBSCRIPTION_ID\") | .name")
   if [[ -z "${AZ_PS1_SUBSCRIPTION}" ]]; then
     AZ_PS1_SUBSCRIPTION="N/A"
