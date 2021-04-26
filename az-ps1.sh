@@ -30,6 +30,7 @@ AZ_PS1_SUFFIX="${AZ_PS1_SUFFIX-)}"
 AZ_PS1_SUBSCRIPTION_COLOR="${AZ_PS1_SUBSCRIPTION_COLOR-red}"
 AZ_PS1_BG_COLOR="${AZ_PS1_BG_COLOR}"
 AZ_PS1_CLOUD_CONFIG_FILE="${HOME}/.azure/clouds.config"
+AZ_PS1_CONFIG_FILE="${HOME}/.azure/config"
 AZ_PS1_AZURE_PROFILE_FILE="${HOME}/.azure/azureProfile.json"
 AZ_PS1_DISABLE_PATH="${HOME}/.azure/az-ps1/disabled"
 
@@ -159,7 +160,7 @@ _az_ps1_update_cache() {
     return
   fi
 
-  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $AZ_PS1_CLOUD_CONFIG_FILE)"
+  AZ_MD5SUM_CURRENT="$($AZ_PS1_MD5_BINARY $AZ_PS1_CLOUD_CONFIG_FILE)$($AZ_PS1_MD5_BINARY $AZ_PS1_CONFIG_FILE)"
 
   if [[ "${AZ_MD5SUM_CURRENT}" != "${AZ_MD5SUM_CACHE}" ]]; then
     # The Azure configuration file changed, fetch
