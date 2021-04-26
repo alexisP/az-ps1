@@ -188,7 +188,7 @@ _az_ps1_get_subscription_with_jq() {
 
 _az_ps1_get_subscription_with_az() {
 
-  AZ_PS1_SUBSCRIPTION="$(${AZ_PS1_BINARY} account show --output tsv | cut -f 4 2>/dev/null)"
+  AZ_PS1_SUBSCRIPTION="$(${AZ_PS1_BINARY} account show --out tsv --query 'name' 2>/dev/null)"
 
   if [[ -z "${AZ_PS1_SUBSCRIPTION}" ]]; then
     AZ_PS1_SUBSCRIPTION="N/A"
